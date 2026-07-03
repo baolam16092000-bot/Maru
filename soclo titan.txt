@@ -1,0 +1,625 @@
+local redzlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/daucobonhi/UiRedzV5/refs/heads/main/DemoUi.lua"))()
+
+local Players = game:GetService("Players")
+
+local UserInputService = game:GetService("UserInputService")
+
+local RunService = game:GetService("RunService")
+
+local TweenService = game:GetService("TweenService")
+
+local LocalPlayer = Players.LocalPlayer
+
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+
+local Humanoid = Character:WaitForChild("Humanoid")
+
+-- UI Setup
+
+local Windows = redzlib:MakeWindow({
+
+    Title = "Titan speakerman-beta",
+
+    SubTitle = "By bảo lâm",
+
+    SaveFolder = "oritusCombo"
+
+})
+
+Windows:AddMinimizeButton({
+
+    Button = { Image = "rbxassetid://131151731604309", BackgroundTransparency = 0 },
+
+    Corner = { CornerRadius = UDim.new(0, 6) }
+
+})
+
+local MainTab = Windows:MakeTab({"Main"}) -- Fixed missing closing quote
+
+MainTab:AddSection("🥵bác gấu dí pi tiên")
+
+-- Biến điều khiển
+
+local isRunning = false
+
+local animationTrack
+
+local selectedPlayer = nil
+
+local playerList = {}
+
+-- Cập nhật danh sách người chơi
+
+local function refreshPlayerList()
+
+    playerList = {}
+
+    for _, plr in ipairs(Players:GetPlayers()) do
+
+        if plr ~= LocalPlayer then
+
+            table.insert(playerList, plr.Name)
+
+        end
+
+    end
+
+end
+
+refreshPlayerList()
+
+-- Dropdown chọn người chơi
+
+MainTab:AddDropdown({
+
+    Name = "Chọn pi tiên",
+
+    Default = false,
+
+    Options = playerList,
+
+    Callback = function(selected)
+
+        selectedPlayer = Players:FindFirstChild(selected)
+
+    end
+
+})
+
+-- Nút làm mới danh sách
+
+MainTab:AddButton({
+
+    Name = "🔄 Làm mới danh sách",
+
+    Callback = function()
+
+        refreshPlayerList()
+
+        redzlib:Notification("🔁 Đã làm mới danh sách!", 2)
+
+    end
+
+})
+
+-- Tạo animation nhảy
+
+local function createAnimation()
+
+    local animation = Instance.new("Animation")
+
+    animation.AnimationId = "rbxassetid://148840371"
+
+    animationTrack = Humanoid:LoadAnimation(animation)
+
+    animationTrack.Looped = true
+
+end
+
+-- Tạo toggle button cho Bay + Nhảy
+
+local flyJumpToggle = MainTab:AddToggle({
+
+    Name = "🚀 bắt đầu dí",
+
+    Default = false,
+
+    Callback = function(value)
+
+        isRunning = value
+
+        
+
+        if not selectedPlayer then
+
+            redzlib:Notification("⚠️ Hãy chọn người chơi trước!", 3)
+
+            flyJumpToggle:Set(false)
+
+            return
+
+        end
+
+        if isRunning then    
+
+            -- Bật chức năng    
+
+            if not animationTrack then createAnimation() end    
+
+            animationTrack:Play()    
+
+                
+
+            -- Nhảy liên tục    
+
+            task.spawn(function()    
+
+                while isRunning and Humanoid and Humanoid.Parent do    
+
+                    local Character = LocalPlayer.Character    
+
+                    if not Character then break end    
+
+                    local leftLeg = Character:FindFirstChild("Left Leg") or Character:FindFirstChild("LeftLowerLeg")    
+
+                    local rightLeg = Character:FindFirstChild("Right Leg") or Character:FindFirstChild("RightLowerLeg")    
+
+                    if leftLeg then pcall(function() leftLeg.CFrame = leftLeg.CFrame * CFrame.Angles(math.rad(-45), 0, 0) end) end    
+
+                    if rightLeg then pcall(function() rightLeg.CFrame = rightLeg.CFrame * CFrame.Angles(math.rad(-45), 0, 0) end) end    
+
+                    task.wait(0.1)    
+
+                end    
+
+            end)    
+
+            -- Bay theo sau    
+
+            task.spawn(function()    
+
+                while isRunning and selectedPlayer and selectedPlayer.Character and LocalPlayer.Character do    
+
+                    local targetHRP = selectedPlayer.Character:FindFirstChild("HumanoidRootPart")    
+
+                    local myHRP = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")    
+
+                    if targetHRP and myHRP then    
+
+                        myHRP.CFrame = targetHRP.CFrame * CFrame.new(0, 0, 0.5)    
+
+                        task.wait(0.02)    
+
+                        myHRP.CFrame = targetHRP.CFrame * CFrame.new(0, 0, 1)    
+
+                    else    
+
+                        break    
+
+                    end    
+
+                    task.wait(0.01)    
+
+                end    
+
+            end)    
+
+            redzlib:Notification("✅ ", 3)    
+
+        else    
+
+            -- Tắt chức năng    
+
+            if animationTrack then    
+
+                animationTrack:Stop()    
+
+            end    
+
+            redzlib:Notification("⛔ ", 3)    
+
+        end    
+
+    end
+
+})
+
+-- Thêm section "nhảy v2"
+
+MainTab:AddSection("🐿️🧂sóc lọ")
+
+-- Biến cho animation nhảy v2
+
+local doing = false
+
+local animtrack = nil
+
+-- Hàm xác định loại rig
+
+local function getmodel()
+
+    return Humanoid.RigType == Enum.HumanoidRigType.R15 and "R15" or "R6"
+
+end
+
+-- Tạo Animation
+
+local animation = Instance.new("Animation")
+
+animation.Name = "aaa"
+
+animation.Parent = workspace
+
+animation.AnimationId = getmodel() == "R15" and "rbxassetid://698251653" or "rbxassetid://72042024"
+
+-- Hàm chạy animation
+
+local function playAnimLoop()
+
+    while doing do
+
+        if not animtrack then
+
+            animtrack = Humanoid.Animator:LoadAnimation(animation)
+
+        end
+
+        animtrack:Play()
+
+        animtrack:AdjustSpeed(0.7)
+
+        animtrack.TimePosition = 0.6
+
+        task.wait(0.1)
+
+        while doing and animtrack and animtrack.TimePosition < 0.7 do
+
+            task.wait(0.05)
+
+        end
+
+        if animtrack then
+
+            animtrack:Stop()
+
+            animtrack:Destroy()
+
+            animtrack = nil
+
+        end
+
+    end
+
+end
+
+-- Tạo toggle button cho Nhảy v2
+
+local danceToggle = MainTab:AddToggle({
+
+    Name = "sóc lọ",
+
+    Default = false,
+
+    Callback = function(value)
+
+        doing = value
+
+        if doing then
+
+            playAnimLoop()
+
+            redzlib:Notification("✅ Đang chơi animation nhảy!", 3)
+
+        elseif animtrack then
+
+            animtrack:Stop()
+
+            animtrack:Destroy()
+
+            animtrack = nil
+
+            redzlib:Notification("⛔ Đã dừng animation nhảy!", 3)
+
+        end
+
+    end
+
+})
+
+-- 🚀 Thêm chức năng Chill Guy
+
+local spaceConfig = {
+
+    Enabled = false,
+
+    BaseSpeed = 5,
+
+    CurrentSpeed = 5,
+
+    RandomSpin = Vector3.new(0.5, 0.2, 0.5),
+
+    DragCoefficient = 0.85,
+
+    SmoothTransition = true,
+
+    SwimMode = false
+
+}
+
+local physics = {
+
+    BodyVelocity = nil,
+
+    BodyAngularVelocity = nil,
+
+    LastPosition = nil,
+
+    DriftParticles = nil
+
+}
+
+local function createParticles(character)
+
+    if physics.DriftParticles then physics.DriftParticles:Destroy() end
+
+    local hrp = character:FindFirstChild("HumanoidRootPart")
+
+    if not hrp then return end
+
+    local particles = Instance.new("ParticleEmitter")
+
+    particles.Texture = "rbxassetid://242699077"
+
+    particles.LightEmission = 0.8
+
+    particles.Size = NumberSequence.new(0.3)
+
+    particles.Transparency = NumberSequence.new(0.5)
+
+    particles.Speed = NumberRange.new(0.5)
+
+    particles.Lifetime = NumberRange.new(0.8)
+
+    particles.Rate = 15
+
+    particles.Rotation = NumberRange.new(0, 360)
+
+    particles.VelocitySpread = 30
+
+    particles.Parent = hrp
+
+    physics.DriftParticles = particles
+
+end
+
+local function enableSpaceMode()
+
+    local character = LocalPlayer.Character
+
+    if not character then return end
+
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+
+    local hrp = character:FindFirstChild("HumanoidRootPart")
+
+    if not humanoid or not hrp then return end
+
+    humanoid.PlatformStand = true
+
+    humanoid.AutoRotate = false
+
+    if spaceConfig.SmoothTransition then
+
+        local tweenInfo = TweenInfo.new(1.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
+        local targetPos = hrp.Position + Vector3.new(0, 3, 0)
+
+        TweenService:Create(hrp, tweenInfo, {CFrame = CFrame.new(targetPos)}):Play()
+
+    end
+
+    physics.BodyVelocity = Instance.new("BodyVelocity")
+
+    physics.BodyVelocity.MaxForce = Vector3.new(4000, 4000, 4000)
+
+    physics.BodyVelocity.Velocity = Vector3.new(0, 0, 0)
+
+    physics.BodyVelocity.P = 1000
+
+    physics.BodyVelocity.Parent = hrp
+
+    physics.BodyAngularVelocity = Instance.new("BodyAngularVelocity")
+
+    physics.BodyAngularVelocity.MaxTorque = Vector3.new(2000, 2000, 2000)
+
+    physics.BodyAngularVelocity.AngularVelocity = spaceConfig.RandomSpin
+
+    physics.BodyAngularVelocity.P = 1500
+
+    physics.BodyAngularVelocity.Parent = hrp
+
+    physics.LastPosition = hrp.Position
+
+    createParticles(character)
+
+    spaceConfig.Enabled = true
+
+    redzlib:Notification("✅ Đã bật Chill Guy mode!", 3)
+
+end
+
+local function disableSpaceMode()
+
+    local character = LocalPlayer.Character
+
+    if not character then return end
+
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+
+    if humanoid then
+
+        humanoid.PlatformStand = false
+
+        humanoid.AutoRotate = true
+
+    end
+
+    if physics.BodyVelocity then physics.BodyVelocity:Destroy() end
+
+    if physics.BodyAngularVelocity then physics.BodyAngularVelocity:Destroy() end
+
+    if physics.DriftParticles then physics.DriftParticles:Destroy() end
+
+    spaceConfig.Enabled = false
+
+    redzlib:Notification("⛔ Đã tắt Chill Guy mode!", 3)
+
+end
+
+local function updateMovement()
+
+    if not spaceConfig.Enabled then return end
+
+    local character = LocalPlayer.Character
+
+    if not character then return end
+
+    local hrp = character:FindFirstChild("HumanoidRootPart")
+
+    if not hrp or not physics.BodyVelocity then return end
+
+    local moveDir = Vector3.new(
+
+        UserInputService:IsKeyDown(Enum.KeyCode.D) and 1 or UserInputService:IsKeyDown(Enum.KeyCode.A) and -1 or 0,
+
+        UserInputService:IsKeyDown(Enum.KeyCode.Space) and 1 or UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) and -1 or 0,
+
+        UserInputService:IsKeyDown(Enum.KeyCode.W) and -1 or UserInputService:IsKeyDown(Enum.KeyCode.S) and 1 or 0
+
+    )
+
+    if moveDir.Magnitude > 0 then
+
+        local cam = workspace.CurrentCamera
+
+        local moveVector = (cam.CFrame.RightVector * moveDir.X) +
+
+                           (cam.CFrame.UpVector * moveDir.Y) +
+
+                           (cam.CFrame.LookVector * moveDir.Z)
+
+        if spaceConfig.SwimMode then
+
+            physics.BodyVelocity.Velocity = physics.BodyVelocity.Velocity:Lerp(moveVector * spaceConfig.CurrentSpeed, 0.05)
+
+        else
+
+            physics.BodyVelocity.Velocity = moveVector * spaceConfig.CurrentSpeed
+
+        end
+
+    else
+
+        physics.BodyVelocity.Velocity = physics.BodyVelocity.Velocity * spaceConfig.DragCoefficient
+
+    end
+
+    if physics.BodyAngularVelocity then
+
+        local factor = spaceConfig.SwimMode and 0.1 or 0.3
+
+        physics.BodyAngularVelocity.AngularVelocity = spaceConfig.RandomSpin +
+
+            Vector3.new(
+
+                math.random(-factor, factor),
+
+                math.random(-factor * 0.5, factor * 0.5),
+
+                math.random(-factor, factor)
+
+            )
+
+    end
+
+end
+
+RunService.Heartbeat:Connect(updateMovement)
+
+-- Thêm toggle button cho Chill Guy
+
+local chillGuyToggle = MainTab:AddToggle({
+
+    Name = "Chill Guy",
+
+    Default = false,
+
+    Callback = function(value)
+
+        spaceConfig.Enabled = value
+
+        if spaceConfig.Enabled then
+
+            enableSpaceMode()
+
+        else
+
+            disableSpaceMode()
+
+        end
+
+    end
+
+})
+
+    
+
+Humanoid.Died:Connect(function()
+
+    doing = false
+
+    isRunning = false
+
+    spaceConfig.Enabled = false
+
+    
+
+    danceToggle:Set(false)
+
+    flyJumpToggle:Set(false)
+
+    chillGuyToggle:Set(false)
+
+    
+
+    if animtrack then
+
+        animtrack:Stop()
+
+        animtrack:Destroy()
+
+        animtrack = nil
+
+    end
+
+    
+
+    if animationTrack then
+
+        animationTrack:Stop()
+
+    end
+
+    
+
+    disableSpaceMode()
+
+end)
+
+    
+
+
+
+    end
+
+})
