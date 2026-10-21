@@ -5332,13 +5332,14 @@ Player = Window:MakeTab({
 
 })
 
+Discord:https://discord.gg/baolamcommunity
+.
 
+({
 
-Discord:AddDiscordInvite({
+	Title = "bao lam | community",
 
-	Title = "SkiringX Hub",
-
-	Description = "A Best New Script",
+	Description = "my sever creator script baolamhub",
 
   Banner = Color3.fromRGB(36, 36, 36),
 
