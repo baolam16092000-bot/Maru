@@ -22140,7 +22140,7 @@ ESP:AddToggle({
                         avatarLabel.Position = UDim2.new(0, 0, 0, 0)
                         avatarLabel.BackgroundTransparency = 1
                         avatarLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
-                        avatarLabel.Image = (info and info.ImageId and info.ImageId ~= 0) and ("rbxassetid://" .. info.ImageId) or DefaultAvatar
+                        avatarLabel.Image = (info and info.ImageId and info.ImageId ~= 0) and ("rbxassetid:/111463291353196/" .. info.ImageId) or DefaultAvatar
 
                         -- 2. Tên Boss
                         local nameLabel = Instance.new("TextLabel", billboard)
